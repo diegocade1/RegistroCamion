@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -84,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
         request = Volley.newRequestQueue(context);
         //Controles
-        etPatente = findViewById(R.id.txtPatente);
-        etSello = findViewById(R.id.txtSello);
-        etFecha = findViewById(R.id.txtFecha);
+        etPatente = findViewById(R.id.etPatente);
+        etSello = findViewById(R.id.etSello);
+        etFecha = findViewById(R.id.etFecha);
 
         btnEnviar = findViewById(R.id.btnEnviar);
         btnFoto = findViewById(R.id.btnFoto);
@@ -96,10 +97,12 @@ public class MainActivity extends AppCompatActivity {
         if(ValidarPermisos())
         {
             btnFoto.setEnabled(true);
+            btnEnviar.setEnabled(true);
         }
         else
         {
             btnFoto.setEnabled(false);
+            btnEnviar.setEnabled(false);
         }
         //Eventos Acciones
         ActionClickFecha(etFecha);
@@ -155,9 +158,10 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode==MIS_PERMISOS)
         {
-            if(grantResults.length==2 && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED && grantResults[2]==PackageManager.PERMISSION_GRANTED && grantResults[3]==PackageManager.PERMISSION_GRANTED)
+            if(grantResults.length==4 && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED && grantResults[2]==PackageManager.PERMISSION_GRANTED && grantResults[3]==PackageManager.PERMISSION_GRANTED)
             {
                 btnFoto.setEnabled(true);
+                btnEnviar.setEnabled(true);
             }
             else
             {
@@ -285,8 +289,18 @@ public class MainActivity extends AppCompatActivity {
 
         File imagen = new File(path);
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imagen));
-        startActivityForResult(intent,COD_FOTO);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imagen));
+        } else {
+            File file = new File(Uri.fromFile(imagen).getPath());
+            Uri photoUri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+        }
+        //startActivityForResult(intent,COD_FOTO);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (intent.resolveActivity(getApplicationContext().getPackageManager()) != null) {
+            startActivityForResult(intent, COD_FOTO);
+        }
     }
 
     @Override
@@ -329,6 +343,27 @@ public class MainActivity extends AppCompatActivity {
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(etPatente.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar la patente", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(etSello.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar el sello", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(etFecha.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar la fecha", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(bitmapImagen==null)
+                {
+                    Toast.makeText(context, "Debe tomar foto del sello", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 CargarWebService();
             }
         });
@@ -340,7 +375,8 @@ public class MainActivity extends AppCompatActivity {
                 "Cargando..."
         );
         pdDialogo.show();
-        String url = "http://192.168.1.122:8080/RegistroCamion/wsJSONRegistroMobil.php";
+        String url = "http://192.168.1.135:80/RegistroCamion/ws/wsJSONRegistroMobil.php";
+        url = "http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php";
 /*        url = url.replace(" ","%20");
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
         request.add(jsonObjectRequest);*/
@@ -354,11 +390,13 @@ public class MainActivity extends AppCompatActivity {
                     etFecha.setText("");
                     etSello.setText("");
                     etPatente.setText("");
+                    ivFoto.setImageResource(0);
+                    //bitmapImagen = null;
                     Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    Toast.makeText(context, "No se pudo ingresar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "No se pudo ingresar"+response, Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {

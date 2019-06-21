@@ -8,51 +8,37 @@
         android:background="#FFF">
 
         <TextView
-            android:id="@+id/lblUsuario"
+            android:id="@+id/lblRegistroPO"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Registro"
+            android:text="Registro PO"
             android:textSize="40sp"
             android:layout_centerHorizontal="true"/>
         <EditText
-            android:id="@+id/etPatente"
+            android:id="@+id/etPO"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/lblUsuario"
-            android:hint="Patente"
-            android:textSize="20sp"/>
-        <EditText
-            android:id="@+id/etSello"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etPatente"
-            android:hint="Sello"
-            android:textSize="20sp"/>
-        <EditText
-            android:id="@+id/etFecha"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etSello"
-            android:hint="Seleccione Fecha"
+            android:layout_below="@id/lblRegistroPO"
+            android:hint="Ingresar PO"
             android:textSize="20sp"/>
         <ImageView
-            android:id="@+id/ivFoto"
+            android:id="@+id/ivFotoProceso"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:layout_below="@id/etFecha"
+            android:layout_below="@id/etPO"
             android:layout_centerHorizontal="true"
             />
         <Button
-            android:id="@+id/btnFoto"
+            android:id="@+id/btnFotoProceso"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/etPatente"
-            android:layout_toRightOf="@id/etSello"
+            android:layout_below="@+id/lblRegistroPO"
+            android:layout_toRightOf="@id/etPO"
             android:layout_marginLeft="20dp"
             android:textSize="20sp"
             android:text="Foto" />
         <Button
-            android:id="@+id/btnEnviar"
+            android:id="@+id/btnGuardarProceso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ivFoto"
@@ -60,6 +46,6 @@
             android:paddingBottom="20dp"
             android:layout_margin="10dp"
             android:textSize="20sp"
-            android:text="Enviar" />
+            android:text="Guardar" />
     </RelativeLayout>
 </ScrollView>
