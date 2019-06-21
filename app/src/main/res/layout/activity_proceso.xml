@@ -41,7 +41,7 @@
             android:id="@+id/btnGuardarProceso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivFoto"
+            android:layout_below="@+id/ivFotoProceso"
             android:paddingTop="20dp"
             android:paddingBottom="20dp"
             android:layout_margin="10dp"
