@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -52,6 +53,8 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
 
+    //private final String URL = "http://192.168.1.135/RegistroCamion/ws/wsJSONRegistroMobil.php";
+    private final String URL = "http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php";
     private final String CARPETA_ROOT = "Imagenes/";
     private final String RUTA_IMAGEN = CARPETA_ROOT+"misFotos";
     private String path;
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     final int MIS_PERMISOS = 100;
     final int COD_SELECCIONA = 10;
     final int COD_FOTO = 20;
+    final int COD_PROCESO = 30;
+
+    final float WIDTH = 800f;
+    final float HEIGHT = 600f;
 
     private Uri pathImage;
     private Bitmap bitmapImagen;
@@ -315,8 +322,9 @@ public class MainActivity extends AppCompatActivity {
                         pathImage = data.getData();
                         //ivFoto.setImageURI(pathImage);
                         try {
-                            bitmapImagen = MediaStore.Images.Media.getBitmap(context.getContentResolver(),pathImage);
+                            bitmapImagen = RedimencionarImagen(RotateBitmap(MediaStore.Images.Media.getBitmap(context.getContentResolver(),pathImage),90f),WIDTH,HEIGHT);
                             ivFoto.setImageBitmap(bitmapImagen);
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -330,8 +338,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                        bitmapImagen = BitmapFactory.decodeFile(path);
+                        bitmapImagen = RedimencionarImagen(RotateBitmap(BitmapFactory.decodeFile(path),90f),WIDTH,HEIGHT);
                         ivFoto.setImageBitmap(bitmapImagen);
+
                         break;
                 }
 
@@ -374,14 +383,14 @@ public class MainActivity extends AppCompatActivity {
         pdDialogo.setMessage(
                 "Cargando..."
         );
+        pdDialogo.setCancelable(false);
         pdDialogo.show();
-        String url = "http://192.168.1.135:80/RegistroCamion/ws/wsJSONRegistroMobil.php";
-        url = "http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php";
+
 /*        url = url.replace(" ","%20");
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
         request.add(jsonObjectRequest);*/
 
-        stringRequest= new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        stringRequest= new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 pdDialogo.hide();
@@ -431,6 +440,56 @@ public class MainActivity extends AppCompatActivity {
         byte [] imagenByte = array.toByteArray();
         String imagenString = Base64.encodeToString(imagenByte,Base64.DEFAULT);
         return imagenString;
+    }
+
+
+
+    private static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    private Bitmap RedimencionarImagen(Bitmap bitmap,float width, float height)
+    {
+        int anchoOld = bitmap.getWidth();
+        int altoOld = bitmap.getHeight();
+
+        if(anchoOld>altoOld)
+        {
+            if(anchoOld >width || altoOld > height)
+            {
+                float escalaAncho = width / anchoOld;
+                float escalaAlto = height / altoOld;
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(escalaAncho,escalaAlto);
+
+                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
+            }
+            else
+            {
+                return bitmap;
+            }
+        }
+        else
+        {
+            if( altoOld >width || anchoOld > height)
+            {
+                float escalaAncho = width / altoOld;
+                float escalaAlto = height / anchoOld;
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(escalaAncho,escalaAlto);
+
+                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
+            }
+            else
+            {
+                return bitmap;
+            }
+        }
     }
 
 }
