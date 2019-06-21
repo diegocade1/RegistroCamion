@@ -53,8 +53,8 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private final String URL = "http://192.168.1.135/RegistroCamion/ws/wsJSONRegistroMobil.php";
-    private final String URL = "http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php";
+    //URL DINAMICO CAMBIAR VALOR EN res/values/strings
+    private String URL;
     private final String CARPETA_ROOT = "Imagenes/";
     private final String RUTA_IMAGEN = CARPETA_ROOT+"misFotos";
     private String path;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //
         context = this;
-
+        URL = getString(R.string.URL_1);
         request = Volley.newRequestQueue(context);
         //Controles
         etPatente = findViewById(R.id.etPatente);
@@ -396,12 +396,16 @@ public class MainActivity extends AppCompatActivity {
                 pdDialogo.hide();
                 if(response.trim().equalsIgnoreCase("registra"))
                 {
+                    //Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
+                    //startActivityForResult(new Intent(MainActivity.this,ProcesoActivity.class),COD_PROCESO);
+                    Intent intent = new Intent(MainActivity.this,ProcesoActivity.class);
+                    intent.putExtra("sello",etSello.getText().toString());
                     etFecha.setText("");
                     etSello.setText("");
                     etPatente.setText("");
                     ivFoto.setImageResource(0);
-                    //bitmapImagen = null;
-                    Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
+                    bitmapImagen = null;
+                    startActivity(intent);
                 }
                 else
                 {

@@ -8,11 +8,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -38,6 +41,8 @@ import java.util.Map;
 
 public class ProcesoActivity extends AppCompatActivity {
 
+    //URL DINAMICO CAMBIAR VALOR EN res/values/strings
+    private String URL;
     private final String CARPETA_ROOT = "Imagenes/";
     private final String RUTA_IMAGEN = CARPETA_ROOT+"misFotos";
     private String path;
@@ -45,14 +50,18 @@ public class ProcesoActivity extends AppCompatActivity {
     final int COD_SELECCIONA = 10;
     final int COD_FOTO = 20;
 
+    final float WIDTH = 800f;
+    final float HEIGHT = 600f;
+
     private Uri pathImage;
     private Bitmap bitmapImagen;
 
     private Context context;
     private EditText etPO;
-    private Button btnFotoProceso, btnGuardarProceso;
+    private Button btnFotoProceso, btnGuardarProceso,btnTerminarProceso;
     private ImageView ivFotoProceso;
     private ProgressDialog pdDialogo;
+    private String Sello;
 
     private RequestQueue request;
     private StringRequest stringRequest;
@@ -63,12 +72,18 @@ public class ProcesoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_proceso);
         //
         context = this;
+        URL = getString(R.string.URL_2);
+        Sello = (String)getIntent().getSerializableExtra("sello");
         //Controles
         etPO = findViewById(R.id.etPO);
         btnFotoProceso = findViewById(R.id.btnFotoProceso);
         btnGuardarProceso=findViewById(R.id.btnGuardarProceso);
+        btnTerminarProceso = findViewById(R.id.btnTerminarProceso);
+        ivFotoProceso = findViewById(R.id.ivFotoProceso);
         // Eventos Acciones
-
+        ActionButtonFoto(btnFotoProceso);
+        ActionButtonGuardar(btnGuardarProceso);
+        ActionButtonTerminarProceso(btnTerminarProceso);
     }
 
     private void ActionButtonFoto(Button boton)
@@ -126,8 +141,18 @@ public class ProcesoActivity extends AppCompatActivity {
 
         File imagen = new File(path);
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imagen));
-        startActivityForResult(intent,COD_FOTO);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imagen));
+        } else {
+            File file = new File(Uri.fromFile(imagen).getPath());
+            Uri photoUri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+        }
+        //startActivityForResult(intent,COD_FOTO);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (intent.resolveActivity(getApplicationContext().getPackageManager()) != null) {
+            startActivityForResult(intent, COD_FOTO);
+        }
     }
 
     @Override
@@ -140,9 +165,11 @@ public class ProcesoActivity extends AppCompatActivity {
             {
                 case COD_SELECCIONA:
                     pathImage = data.getData();
+                    //ivFoto.setImageURI(pathImage);
                     try {
-                        bitmapImagen = MediaStore.Images.Media.getBitmap(context.getContentResolver(),pathImage);
+                        bitmapImagen = RedimencionarImagen(RotateBitmap(MediaStore.Images.Media.getBitmap(context.getContentResolver(),pathImage),90f),WIDTH,HEIGHT);
                         ivFotoProceso.setImageBitmap(bitmapImagen);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -156,19 +183,37 @@ public class ProcesoActivity extends AppCompatActivity {
                         }
                     });
 
-                    bitmapImagen = BitmapFactory.decodeFile(path);
+                    bitmapImagen = RedimencionarImagen(RotateBitmap(BitmapFactory.decodeFile(path),90f),WIDTH,HEIGHT);
                     ivFotoProceso.setImageBitmap(bitmapImagen);
+
                     break;
             }
 
         }
     }
 
-    private void ActionButtonEnviar(Button boton)
+    private void ActionButtonGuardar(Button boton)
     {
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String po = etPO.getText().toString();
+                String sello = Sello;
+                if(etPO.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar la PO", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(Sello.equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar el sello", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(bitmapImagen==null)
+                {
+                    Toast.makeText(context, "Debe tomar foto del sello", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 CargarWebService();
             }
         });
@@ -180,18 +225,19 @@ public class ProcesoActivity extends AppCompatActivity {
                 "Cargando..."
         );
         pdDialogo.show();
-        String url = "http://192.168.1.122:8080/RegistroCamion/wsJSONRegistroMobil.php";
+
 /*        url = url.replace(" ","%20");
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
         request.add(jsonObjectRequest);*/
 
-        stringRequest= new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        stringRequest= new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 pdDialogo.hide();
                 if(response.trim().equalsIgnoreCase("registra"))
                 {
                     etPO.setText("");
+                    bitmapImagen = null;
                     ivFotoProceso.setImageResource(0);
                     Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
                 }
@@ -209,17 +255,15 @@ public class ProcesoActivity extends AppCompatActivity {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                //String patente = etPatente.getText().toString();
-                //String sello = etSello.getText().toString();
-                //String fecha = etFecha.getText().toString();
+                String po = etPO.getText().toString();
+                String sello = Sello;
 
                 String imagen = ConvertirImagenString(bitmapImagen);
 
                 Map<String,String> parameters = new HashMap<>();
-                //parameters.put("patente",patente);
-                //parameters.put("sello",sello);
-                //parameters.put("fecha",fecha);
-                //parameters.put("imagen",imagen);
+                parameters.put("po",po);
+                parameters.put("sello",sello);
+                parameters.put("imagen",imagen);
                 return parameters;
             }
         };
@@ -232,5 +276,63 @@ public class ProcesoActivity extends AppCompatActivity {
         byte [] imagenByte = array.toByteArray();
         String imagenString = Base64.encodeToString(imagenByte,Base64.DEFAULT);
         return imagenString;
+    }
+
+    private static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    private Bitmap RedimencionarImagen(Bitmap bitmap,float width, float height)
+    {
+        int anchoOld = bitmap.getWidth();
+        int altoOld = bitmap.getHeight();
+
+        if(anchoOld>altoOld)
+        {
+            if(anchoOld >width || altoOld > height)
+            {
+                float escalaAncho = width / anchoOld;
+                float escalaAlto = height / altoOld;
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(escalaAncho,escalaAlto);
+
+                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
+            }
+            else
+            {
+                return bitmap;
+            }
+        }
+        else
+        {
+            if( altoOld >width || anchoOld > height)
+            {
+                float escalaAncho = width / altoOld;
+                float escalaAlto = height / anchoOld;
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(escalaAncho,escalaAlto);
+
+                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
+            }
+            else
+            {
+                return bitmap;
+            }
+        }
+    }
+
+    private void ActionButtonTerminarProceso(Button button)
+    {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 }

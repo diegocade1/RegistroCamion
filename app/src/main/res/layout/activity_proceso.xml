@@ -47,5 +47,16 @@
             android:layout_margin="10dp"
             android:textSize="20sp"
             android:text="Guardar" />
+        <Button
+            android:id="@+id/btnTerminarProceso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnGuardarProceso"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:layout_marginTop="80dp"
+            android:textSize="20sp"
+            android:text="Terminar" />
     </RelativeLayout>
 </ScrollView>
