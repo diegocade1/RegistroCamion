@@ -32,6 +32,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,6 +74,7 @@ public class ProcesoActivity extends AppCompatActivity {
         //
         context = this;
         URL = getString(R.string.URL_2);
+        request = Volley.newRequestQueue(context);
         Sello = (String)getIntent().getSerializableExtra("sello");
         //Controles
         etPO = findViewById(R.id.etPO);
@@ -256,13 +258,12 @@ public class ProcesoActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 String po = etPO.getText().toString();
-                String sello = Sello;
 
                 String imagen = ConvertirImagenString(bitmapImagen);
 
                 Map<String,String> parameters = new HashMap<>();
                 parameters.put("po",po);
-                parameters.put("sello",sello);
+                parameters.put("sello",Sello);
                 parameters.put("imagen",imagen);
                 return parameters;
             }
