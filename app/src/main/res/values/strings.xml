@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Registro Camion</string>
-    <!--<string name="URL_1">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>-->
-    <!--<string name="URL_2">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>-->
-    <string name="URL_1">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>
-    <string name="URL_2">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>
+    <string name="URL_1">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>
+    <string name="URL_2">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>
+    <!--<string name="URL_1">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>-->
+    <!--<string name="URL_2">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>-->
+    <!--<string name="URL_1">http://fastpharma.cl/ws/wsJSONRegistroMobil.php</string>-->
+    <!--<string name="URL_2">http://fastpharma.cl/ws/wsJSONRegistroMobilDetalle.php</string>-->
 </resources>
