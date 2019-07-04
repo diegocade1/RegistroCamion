@@ -1,65 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content">>
     <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rlMain"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFF">
+        android:layout_height="match_parent"
+        android:background="#FFF"
+        tools:context=".MainActivity">
 
         <TextView
-            android:id="@+id/lblUsuario"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Registro"
-            android:textSize="40sp"
-            android:layout_centerHorizontal="true"/>
-        <EditText
-            android:id="@+id/etPatente"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/lblUsuario"
-            android:hint="Patente"
-            android:textSize="20sp"/>
-        <EditText
-            android:id="@+id/etSello"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etPatente"
-            android:hint="Sello"
-            android:textSize="20sp"/>
-        <EditText
-            android:id="@+id/etFecha"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etSello"
-            android:hint="Seleccione Fecha"
-            android:textSize="20sp"/>
-        <ImageView
-            android:id="@+id/ivFoto"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_below="@id/etFecha"
-            android:layout_centerHorizontal="true"
-            />
-        <Button
-            android:id="@+id/btnFoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etPatente"
-            android:layout_toRightOf="@id/etSello"
-            android:layout_marginLeft="20dp"
-            android:textSize="20sp"
-            android:text="Foto" />
-        <Button
-            android:id="@+id/btnEnviar"
+            android:id="@+id/lblMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivFoto"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:layout_margin="10dp"
-            android:textSize="20sp"
-            android:text="Enviar" />
+            android:text="Menu"
+            android:textSize="40dp"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/lblMenu"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="-1dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="top|center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <Button
+                android:id="@+id/btnRegistro"
+                android:layout_width="300dp"
+                android:layout_marginTop="-10dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="10dp"
+                android:text="Registro" />
+
+            <Button
+                android:id="@+id/btnSalir"
+                android:layout_width="300dp"
+                android:layout_marginTop="10dp"
+                android:layout_height="70dp"
+                android:text="Salir" />
+        </LinearLayout>
     </RelativeLayout>
 </ScrollView>

@@ -1,29 +1,17 @@
 package com.atc.registrocamion;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -34,9 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,23 +30,13 @@ public class ProcesoActivity extends AppCompatActivity {
 
     //URL DINAMICO CAMBIAR VALOR EN res/values/strings
     private String URL;
-    private final String CARPETA_ROOT = "Imagenes/";
-    private final String RUTA_IMAGEN = CARPETA_ROOT+"misFotos";
-    private String path;
 
-    final int COD_SELECCIONA = 10;
-    final int COD_FOTO = 20;
-
-    final float WIDTH = 800f;
-    final float HEIGHT = 600f;
 
     private Uri pathImage;
-    private Bitmap bitmapImagen;
 
     private Context context;
-    private EditText etPO;
-    private Button btnFotoProceso, btnGuardarProceso,btnTerminarProceso;
-    private ImageView ivFotoProceso;
+    private EditText etGuiaAerea,etHoraIniciaDescarga,etHoraTerminoDescarga;
+    private Button  btnGuardarProceso,btnTerminarProceso;
     private ProgressDialog pdDialogo;
     private String Sello;
 
@@ -77,145 +53,63 @@ public class ProcesoActivity extends AppCompatActivity {
         request = Volley.newRequestQueue(context);
         Sello = (String)getIntent().getSerializableExtra("sello");
         //Controles
-        etPO = findViewById(R.id.etPO);
-        btnFotoProceso = findViewById(R.id.btnFotoProceso);
+        etGuiaAerea = findViewById(R.id.etGuiaAerea);
+        etHoraIniciaDescarga = findViewById(R.id.etHoraInicioDescarga);
+        etHoraTerminoDescarga = findViewById(R.id.etHoraTerminoDescarga);
         btnGuardarProceso=findViewById(R.id.btnGuardarProceso);
         btnTerminarProceso = findViewById(R.id.btnTerminarProceso);
-        ivFotoProceso = findViewById(R.id.ivFotoProceso);
         // Eventos Acciones
-        ActionButtonFoto(btnFotoProceso);
         ActionButtonGuardar(btnGuardarProceso);
         ActionButtonTerminarProceso(btnTerminarProceso);
+        ActionTouchHora(etHoraIniciaDescarga);
+        ActionTouchHora(etHoraTerminoDescarga);
     }
 
-    private void ActionButtonFoto(Button boton)
+    private void ActionTouchHora(final EditText hora)
     {
-        boton.setOnClickListener(new View.OnClickListener() {
+
+        hora.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                final CharSequence[] opciones = {"Tomar Foto","Cargar Imagen","Cancelar"};
-                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setTitle("Seleccione una opcion");
-                alertDialog.setItems(opciones, new DialogInterface.OnClickListener() {
-                    @SuppressLint("NewApi")
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(opciones[which].equals("Tomar Foto"))
-                        {
-                            TomarFoto();
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    Calendar mcurrentTime = Calendar.getInstance();
+                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                    int minute = mcurrentTime.get(Calendar.MINUTE);
+                    TimePickerDialog mTimePicker;
+                    mTimePicker = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                            hora.setText( String.format("%02d", selectedHour) + ":" + String.format("%02d", selectedMinute));
                         }
-                        else
-                        {
-                            if(opciones[which].equals("Cargar Imagen"))
-                            {
-                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                intent.setType("image/");
-                                startActivityForResult(intent.createChooser(intent,"Seleccione la aplicacion"),COD_SELECCIONA);
-                            }
-                            else
-                            {
-                                dialog.dismiss();
-                            }
-                        }
-                    }
-                });
-                alertDialog.show();
+                    }, hour, minute, true);//Yes 24 hour time
+                    mTimePicker.setTitle("Seleccione la hora:");
+                    mTimePicker.show();
+                    return true;
+                }
+                return false;
             }
         });
     }
 
-    private void TomarFoto()
-    {
-        File fileImagen = new File(Environment.getExternalStorageDirectory(),RUTA_IMAGEN);
-        boolean isCreated = fileImagen.exists();
-        String nombreImagen ="";
-        if(isCreated==false)
-        {
-            isCreated = fileImagen.mkdirs();
-        }
-
-        if(isCreated == true)
-        {
-            nombreImagen = (System.currentTimeMillis()/1000)+".jpg";
-        }
-
-        path = Environment.getExternalStorageDirectory()+File.separator+RUTA_IMAGEN+File.separator+nombreImagen;
-
-        File imagen = new File(path);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imagen));
-        } else {
-            File file = new File(Uri.fromFile(imagen).getPath());
-            Uri photoUri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-        }
-        //startActivityForResult(intent,COD_FOTO);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (intent.resolveActivity(getApplicationContext().getPackageManager()) != null) {
-            startActivityForResult(intent, COD_FOTO);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(resultCode==RESULT_OK)
-        {
-            switch(requestCode)
-            {
-                case COD_SELECCIONA:
-                    pathImage = data.getData();
-                    //ivFoto.setImageURI(pathImage);
-                    try {
-                        bitmapImagen = RedimencionarImagen(RotateBitmap(MediaStore.Images.Media.getBitmap(context.getContentResolver(),pathImage),90f),WIDTH,HEIGHT);
-                        ivFotoProceso.setImageBitmap(bitmapImagen);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    break;
-                case COD_FOTO:
-                    MediaScannerConnection.scanFile(this, new String[]{path}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                        @Override
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("Ruta de almacenamiento","Path:"+path);
-                        }
-                    });
-
-                    bitmapImagen = RedimencionarImagen(RotateBitmap(BitmapFactory.decodeFile(path),90f),WIDTH,HEIGHT);
-                    ivFotoProceso.setImageBitmap(bitmapImagen);
-
-                    break;
-            }
-
-        }
-    }
 
     private void ActionButtonGuardar(Button boton)
     {
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String po = etPO.getText().toString();
+//                String po = etPO.getText().toString();
                 String sello = Sello;
-                if(etPO.getText().toString().equals(""))
-                {
-                    Toast.makeText(context, "Debe ingresar la PO", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+//                if(etPO.getText().toString().equals(""))
+//                {
+//                    Toast.makeText(context, "Debe ingresar la PO", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 if(Sello.equals(""))
                 {
                     Toast.makeText(context, "Debe ingresar el sello", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(bitmapImagen==null)
-                {
-                    Toast.makeText(context, "Debe tomar foto del sello", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+
                 CargarWebService();
             }
         });
@@ -238,9 +132,9 @@ public class ProcesoActivity extends AppCompatActivity {
                 pdDialogo.hide();
                 if(response.trim().equalsIgnoreCase("registra"))
                 {
-                    etPO.setText("");
-                    bitmapImagen = null;
-                    ivFotoProceso.setImageResource(0);
+                    //etPO.setText("");
+                    //bitmapImagen = null;
+                    //ivFotoProceso.setImageResource(0);
                     Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
                 }
                 else
@@ -257,75 +151,20 @@ public class ProcesoActivity extends AppCompatActivity {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                String po = etPO.getText().toString();
+                //String po = etPO.getText().toString();
 
-                String imagen = ConvertirImagenString(bitmapImagen);
+                //String imagen = ConvertirImagenString(bitmapImagen);
 
                 Map<String,String> parameters = new HashMap<>();
-                parameters.put("po",po);
+                //parameters.put("po",po);
                 parameters.put("sello",Sello);
-                parameters.put("imagen",imagen);
+                //parameters.put("imagen",imagen);
                 return parameters;
             }
         };
         request.add(stringRequest);
     }
 
-    private String ConvertirImagenString(Bitmap bitmapImagen) {
-        ByteArrayOutputStream array = new ByteArrayOutputStream();
-        bitmapImagen.compress(Bitmap.CompressFormat.JPEG,100,array);
-        byte [] imagenByte = array.toByteArray();
-        String imagenString = Base64.encodeToString(imagenByte,Base64.DEFAULT);
-        return imagenString;
-    }
-
-    private static Bitmap RotateBitmap(Bitmap source, float angle)
-    {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
-
-    private Bitmap RedimencionarImagen(Bitmap bitmap,float width, float height)
-    {
-        int anchoOld = bitmap.getWidth();
-        int altoOld = bitmap.getHeight();
-
-        if(anchoOld>altoOld)
-        {
-            if(anchoOld >width || altoOld > height)
-            {
-                float escalaAncho = width / anchoOld;
-                float escalaAlto = height / altoOld;
-
-                Matrix matrix = new Matrix();
-                matrix.postScale(escalaAncho,escalaAlto);
-
-                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
-            }
-            else
-            {
-                return bitmap;
-            }
-        }
-        else
-        {
-            if( altoOld >width || anchoOld > height)
-            {
-                float escalaAncho = width / altoOld;
-                float escalaAlto = height / anchoOld;
-
-                Matrix matrix = new Matrix();
-                matrix.postScale(escalaAncho,escalaAlto);
-
-                return bitmap.createBitmap(bitmap,0,0,anchoOld,altoOld,matrix,false);
-            }
-            else
-            {
-                return bitmap;
-            }
-        }
-    }
 
     private void ActionButtonTerminarProceso(Button button)
     {

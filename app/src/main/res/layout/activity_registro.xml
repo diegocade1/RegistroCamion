@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFF">
+
+        <TextView
+            android:id="@+id/lblTituloRegistro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registro"
+            android:textSize="40sp"
+            android:layout_centerHorizontal="true"/>
+        <EditText
+            android:id="@+id/etTerminal"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lblTituloRegistro"
+            android:hint="Terminal"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etAnden"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etTerminal"
+            android:hint="Anden"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etPatente"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etAnden"
+            android:hint="Patente"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etChofer"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etPatente"
+            android:hint="Chofer"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etHoraLlegadaCamion"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etChofer"
+            android:hint="Hora llegada camion"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etHoraIngresoTerminal"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etHoraLlegadaCamion"
+            android:hint="Hora ingreso terminal"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etHoraAperturaCamion"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etHoraIngresoTerminal"
+            android:hint="Hora apertura camion"
+            android:textSize="20sp"/>
+
+        <ImageSwitcher
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/isImagenes"
+            android:layout_below="@id/etHoraAperturaCamion"
+            android:layout_centerHorizontal="true">
+            <ImageView
+                android:id="@+id/ivFoto"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_centerHorizontal="true"
+                />
+        </ImageSwitcher>
+        <Button
+            android:id="@+id/btnFotoRegistro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etHoraIngresoTerminal"
+            android:layout_toRightOf="@id/etHoraAperturaCamion"
+            android:layout_marginLeft="20dp"
+            android:textSize="20sp"
+            android:text="Foto" />
+        <Button
+            android:id="@+id/btnEnviarRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/isImagenes"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:layout_margin="10dp"
+            android:textSize="20sp"
+            android:text="Enviar" />
+    </RelativeLayout>
+</ScrollView>

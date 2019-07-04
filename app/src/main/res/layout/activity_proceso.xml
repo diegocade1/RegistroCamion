@@ -8,40 +8,39 @@
         android:background="#FFF">
 
         <TextView
-            android:id="@+id/lblRegistroPO"
+            android:id="@+id/lblTituloProceso"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Registro PO"
+            android:text="Proceso"
             android:textSize="40sp"
             android:layout_centerHorizontal="true"/>
         <EditText
-            android:id="@+id/etPO"
+            android:id="@+id/etGuiaAerea"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/lblRegistroPO"
-            android:hint="Ingresar PO"
+            android:layout_below="@id/lblTituloProceso"
+            android:hint="Ingresar guia aerea"
             android:textSize="20sp"/>
-        <ImageView
-            android:id="@+id/ivFotoProceso"
+        <EditText
+            android:id="@+id/etHoraInicioDescarga"
             android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_below="@id/etPO"
-            android:layout_centerHorizontal="true"
-            />
-        <Button
-            android:id="@+id/btnFotoProceso"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblRegistroPO"
-            android:layout_toRightOf="@id/etPO"
-            android:layout_marginLeft="20dp"
-            android:textSize="20sp"
-            android:text="Foto" />
+            android:layout_below="@id/etGuiaAerea"
+            android:hint="Hora inicio descarga"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/etHoraTerminoDescarga"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etHoraInicioDescarga"
+            android:hint="Hora Termino Descarga"
+            android:textSize="20sp"/>
+
         <Button
             android:id="@+id/btnGuardarProceso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivFotoProceso"
+            android:layout_below="@+id/etHoraTerminoDescarga"
             android:paddingTop="20dp"
             android:paddingBottom="20dp"
             android:layout_margin="10dp"
