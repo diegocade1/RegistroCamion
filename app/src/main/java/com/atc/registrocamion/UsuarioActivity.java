@@ -54,6 +54,7 @@ public class UsuarioActivity extends AppCompatActivity {
                 {
                     startActivity(new Intent(UsuarioActivity.this,ClienteActivity.class)
                             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                    esconderKeyboard();
 
                 }
                 else
@@ -83,7 +84,7 @@ public class UsuarioActivity extends AppCompatActivity {
                     {
                         Toast.makeText(getApplicationContext(), "Ingrese Usuario", Toast.LENGTH_SHORT).show();
                     }
-                    //esconderKeyboard();
+                    esconderKeyboard();
                     return true;
                 }
                 else

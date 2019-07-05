@@ -2,14 +2,18 @@ package com.atc.registrocamion;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.atc.registrocamion.Entidades.Cliente;
 
 public class ClienteActivity extends AppCompatActivity {
 
@@ -17,6 +21,8 @@ public class ClienteActivity extends AppCompatActivity {
 
     Button btnAceptar,btnCancerlar;
     EditText etCliente;
+
+    final int COD_LISTA = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,38 @@ public class ClienteActivity extends AppCompatActivity {
 
         ActionBtnAceptar(btnAceptar);
         ActionBtnCancelar(btnCancerlar);
-        ActionKeyPressTextCliente(etCliente);
+        //ActionKeyPressTextCliente(etCliente);
+        ActionTouchCliente(etCliente);
+        esconderKeyboard();
+    }
+
+    private void ActionTouchCliente(final EditText hora)
+    {
+
+        hora.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    startActivityForResult(new Intent(ClienteActivity.this,ListaClientesActivity.class),COD_LISTA);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case COD_LISTA:
+                    etCliente.setText(data.getStringExtra("result"));
+                    break;
+                    default:
+                        break;
+            }
+        }
     }
 
     private void ActionBtnCancelar(Button boton)
@@ -55,6 +92,7 @@ public class ClienteActivity extends AppCompatActivity {
                 {
                     startActivity(new Intent(ClienteActivity.this,RegistroActivity.class)
                             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                    esconderKeyboard();
 
                 }
                 else

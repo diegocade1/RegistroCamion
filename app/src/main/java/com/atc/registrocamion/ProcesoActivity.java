@@ -49,7 +49,7 @@ public class ProcesoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_proceso);
         //
         context = this;
-        URL = getString(R.string.URL_2);
+        URL = getString(R.string.URL_Proceso);
         request = Volley.newRequestQueue(context);
         Sello = (String)getIntent().getSerializableExtra("sello");
         //Controles

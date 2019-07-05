@@ -8,7 +8,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -28,11 +27,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -41,8 +42,17 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.atc.registrocamion.Adapter.AndenAdapter;
+import com.atc.registrocamion.Adapter.TerminalAdapter;
+import com.atc.registrocamion.Entidades.Anden;
+import com.atc.registrocamion.Entidades.Terminal;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,10 +63,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class RegistroActivity extends AppCompatActivity {
+//public class RegistroActivity extends AppCompatActivity implements Response.Listener<JSONObject>,Response.ErrorListener {
+public class RegistroActivity extends AppCompatActivity  {
 
     //URL DINAMICO CAMBIAR VALOR EN res/values/strings
-    private String URL;
+    private String URL_Registro,URL_Lista_Terminal,URL_Lista_Anden;
     private final String CARPETA_ROOT = "Imagenes/";
     private final String RUTA_IMAGEN = CARPETA_ROOT+"misFotos";
     private String path;
@@ -79,14 +90,18 @@ public class RegistroActivity extends AppCompatActivity {
     private Context context;
     private DatePickerDialog picker;
     private EditText etPatente,etTerminal,etAnden,etChofer,etHoraLlegadaCamion,etHoraIngresoTerminal,etHoraAperturaCamion;
+    private Spinner spnrTerminal,spnrAnden;
     private Button btnFoto,btnEnviar;
     private ImageView ivFoto;
     private ProgressDialog pdDialogo;
     private ImageSwitcher isImagenes;
 
     private RequestQueue request;
-
+    private JsonObjectRequest jsonObjectRequest;
     private StringRequest stringRequest;
+
+    private ArrayList<Terminal> listaTerminal;
+    private ArrayList<Anden> listaAnden;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +109,16 @@ public class RegistroActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registro);
         //
         context = this;
-        URL = getString(R.string.URL_1);
+        URL_Registro = getString(R.string.URL_Registro);
+        URL_Lista_Terminal = getString(R.string.URL_ListaTerminal);
+        URL_Lista_Anden = getString(R.string.URL_ListaAnden);
         request = Volley.newRequestQueue(context);
+        listaTerminal = new ArrayList<>();
+        listaAnden = new ArrayList<>();
         //Controles
         etPatente = findViewById(R.id.etPatente);
-        etTerminal = findViewById(R.id.etTerminal);
-        etAnden = findViewById(R.id.etAnden);
+        //etTerminal = findViewById(R.id.etTerminal);
+        //etAnden = findViewById(R.id.etAnden);
         etChofer = findViewById(R.id.etChofer);
         etHoraLlegadaCamion = findViewById(R.id.etHoraLlegadaCamion);
         etHoraIngresoTerminal = findViewById(R.id.etHoraIngresoTerminal);
@@ -111,6 +130,11 @@ public class RegistroActivity extends AppCompatActivity {
         ivFoto = findViewById(R.id.ivFoto);
 
         isImagenes = findViewById(R.id.isImagenes);
+
+        spnrTerminal = findViewById(R.id.spnrTerminal);
+        spnrAnden = findViewById(R.id.spnrAnden);
+        // Carga de Lista
+        cargarWebServiceListaTerminal();
         //Eventos Acciones
 
         //ActionTouchFecha(etFecha);
@@ -122,6 +146,98 @@ public class RegistroActivity extends AppCompatActivity {
         ActionButtonEnviar(btnEnviar);
 
         ActionSwipeImageSwitcher(isImagenes);
+        ActionOnDropDown(spnrTerminal);
+    }
+
+    private void cargarWebServiceListaTerminal() {
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_Lista_Terminal, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try
+                {
+                    Terminal terminal = null;
+                    JSONArray jsonArray = response.optJSONArray("terminal");
+
+                    for(int index = 0; index<jsonArray.length();index++)
+                    {
+                        terminal = new Terminal();
+                        JSONObject jsonObject = null;
+                        jsonObject=jsonArray.getJSONObject(index);
+                        terminal.setID(jsonObject.getInt("ID"));
+                        terminal.setNombre(jsonObject.getString("Nombre"));
+                        listaTerminal.add(terminal);
+                    }
+
+                    TerminalAdapter adapter = new TerminalAdapter(context,listaTerminal);
+                    spnrTerminal.setAdapter(adapter);
+
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(context, "No se ha podido conectar", Toast.LENGTH_SHORT).show();
+                    Log.e("ERROR:",e.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "No se ha podido conectar, error al traer lista de terminales", Toast.LENGTH_SHORT).show();
+                Log.e("ERROR:",error.toString());
+            }
+        });
+        request.add(jsonObjectRequest);
+    }
+
+    private void cargarWebServiceListaAnden(String id) throws JSONException {
+
+        JSONObject jo = new JSONObject();
+        jo.put("id", "1");
+
+        JSONArray ja = new JSONArray();
+        ja.put(jo);
+
+        JSONObject mainObj = new JSONObject();
+        mainObj.put("terminal", ja);
+
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_Lista_Anden,mainObj, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try
+                {
+                    Anden anden = null;
+                    JSONArray jsonArray = response.optJSONArray("anden");
+
+                    for(int index = 0; index<jsonArray.length();index++)
+                    {
+                        anden = new Anden();
+                        JSONObject jsonObject = null;
+                        jsonObject=jsonArray.getJSONObject(index);
+                        anden.setID(jsonObject.getInt("ID"));
+                        anden.setTerminal_id(jsonObject.getInt("Terminal_id"));
+                        anden.setNombre(jsonObject.getString("Nombre"));
+                        listaAnden.add(anden);
+                    }
+
+                    AndenAdapter adapter = new AndenAdapter(listaAnden,context);
+                    spnrAnden.setAdapter(adapter);
+
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(context, "No se ha podido conectar", Toast.LENGTH_SHORT).show();
+                    Log.e("ERROR:",e.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "No se ha podido conectar, error al traer lista de andenes, "+error.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                Log.e("ERROR:",error.toString());
+            }
+        });
+        request.add(jsonObjectRequest);
     }
 
     private void ActionSwipeImageSwitcher(ImageSwitcher imageSwitcher)
@@ -417,7 +533,7 @@ public class RegistroActivity extends AppCompatActivity {
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
         request.add(jsonObjectRequest);*/
 
-        stringRequest= new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        stringRequest= new StringRequest(Request.Method.POST, URL_Registro, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 pdDialogo.hide();
@@ -522,4 +638,24 @@ public class RegistroActivity extends AppCompatActivity {
         }
     }
 
+    private void ActionOnDropDown(Spinner spinner)
+    {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Terminal terminal = (Terminal)parent.getItemAtPosition(position);
+                try {
+                    cargarWebServiceListaAnden(Integer.toString(terminal.getID()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Error:" + e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
 }

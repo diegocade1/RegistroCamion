@@ -14,25 +14,24 @@
             android:text="Registro"
             android:textSize="40sp"
             android:layout_centerHorizontal="true"/>
-        <EditText
-            android:id="@+id/etTerminal"
+        <Spinner
+            android:id="@+id/spnrTerminal"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/lblTituloRegistro"
-            android:hint="Terminal"
-            android:textSize="20sp"/>
-        <EditText
-            android:id="@+id/etAnden"
+            android:textSize="15sp"
+            android:layout_below="@id/lblTituloRegistro"/>
+        <Spinner
+            android:id="@+id/spnrAnden"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/etTerminal"
-            android:hint="Anden"
-            android:textSize="20sp"/>
+            android:textSize="15sp"
+            android:layout_below="@id/spnrTerminal"/>
+
         <EditText
             android:id="@+id/etPatente"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/etAnden"
+            android:layout_below="@id/spnrAnden"
             android:hint="Patente"
             android:textSize="20sp"/>
         <EditText
