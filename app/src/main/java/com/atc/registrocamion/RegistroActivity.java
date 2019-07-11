@@ -49,6 +49,7 @@ import com.atc.registrocamion.Adapter.AndenAdapter;
 import com.atc.registrocamion.Adapter.TerminalAdapter;
 import com.atc.registrocamion.Entidades.Anden;
 import com.atc.registrocamion.Entidades.Terminal;
+import com.atc.registrocamion.Entidades.Usuario;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +58,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,12 +91,14 @@ public class RegistroActivity extends AppCompatActivity  {
 
     private Context context;
     private DatePickerDialog picker;
-    private EditText etPatente,etTerminal,etAnden,etChofer,etHoraLlegadaCamion,etHoraIngresoTerminal,etHoraAperturaCamion;
+    private EditText etPatente,etChofer,etHoraLlegadaCamion,etHoraIngresoTerminal,etHoraAperturaCamion;
     private Spinner spnrTerminal,spnrAnden;
     private Button btnFoto,btnEnviar;
     private ImageView ivFoto;
     private ProgressDialog pdDialogo;
     private ImageSwitcher isImagenes;
+    private String cliente;
+    private Usuario usuario;
 
     private RequestQueue request;
     private JsonObjectRequest jsonObjectRequest;
@@ -115,10 +119,11 @@ public class RegistroActivity extends AppCompatActivity  {
         request = Volley.newRequestQueue(context);
         listaTerminal = new ArrayList<>();
         listaAnden = new ArrayList<>();
+        usuario = (Usuario) getIntent().getSerializableExtra("usuario");
+        cliente = (String) getIntent().getSerializableExtra("cliente");
         //Controles
         etPatente = findViewById(R.id.etPatente);
-        //etTerminal = findViewById(R.id.etTerminal);
-        //etAnden = findViewById(R.id.etAnden);
+
         etChofer = findViewById(R.id.etChofer);
         etHoraLlegadaCamion = findViewById(R.id.etHoraLlegadaCamion);
         etHoraIngresoTerminal = findViewById(R.id.etHoraIngresoTerminal);
@@ -192,7 +197,7 @@ public class RegistroActivity extends AppCompatActivity  {
     private void cargarWebServiceListaAnden(String id) throws JSONException {
 
         JSONObject jo = new JSONObject();
-        jo.put("id", "1");
+        jo.put("id", id);
 
         JSONArray ja = new JSONArray();
         ja.put(jo);
@@ -200,11 +205,15 @@ public class RegistroActivity extends AppCompatActivity  {
         JSONObject mainObj = new JSONObject();
         mainObj.put("terminal", ja);
 
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_Lista_Anden,mainObj, new Response.Listener<JSONObject>() {
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL_Lista_Anden,mainObj, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try
                 {
+                    AndenAdapter adapter = new AndenAdapter(listaAnden,context);
+                    adapter.clear();
+                    adapter.notifyDataSetChanged();
+
                     Anden anden = null;
                     JSONArray jsonArray = response.optJSONArray("anden");
 
@@ -219,14 +228,14 @@ public class RegistroActivity extends AppCompatActivity  {
                         listaAnden.add(anden);
                     }
 
-                    AndenAdapter adapter = new AndenAdapter(listaAnden,context);
+                    adapter = new AndenAdapter(listaAnden,context);
                     spnrAnden.setAdapter(adapter);
 
                 }
                 catch (JSONException e)
                 {
                     e.printStackTrace();
-                    Toast.makeText(context, "No se ha podido conectar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "ERROR: "+ e.toString(), Toast.LENGTH_SHORT).show();
                     Log.e("ERROR:",e.toString());
                 }
             }
@@ -496,32 +505,54 @@ public class RegistroActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
 
+                Terminal ter = (Terminal)spnrTerminal.getSelectedItem();
+                Anden and =(Anden)spnrAnden.getSelectedItem();
+                if(ter.getID()<=0)
+                {
+                    Toast.makeText(context, "Debe seleccionar la terminal", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(and.getID()<=0)
+                {
+                    Toast.makeText(context, "Debe seleccionar el anden", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(etPatente.getText().toString().equals(""))
                 {
                     Toast.makeText(context, "Debe ingresar la patente", Toast.LENGTH_SHORT).show();
                     return;
                 }
-/*                if(etSello.getText().toString().equals(""))
+                if(etChofer.getText().toString().equals(""))
                 {
-                    Toast.makeText(context, "Debe ingresar el sello", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Debe ingresar el chofer", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(etFecha.getText().toString().equals(""))
+                if(etHoraLlegadaCamion.getText().toString().equals(""))
                 {
-                    Toast.makeText(context, "Debe ingresar la fecha", Toast.LENGTH_SHORT).show();
-                    return;
-                }*/
-                if(bitmapImagen==null)
-                {
-                    Toast.makeText(context, "Debe tomar foto del sello", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Debe seleccionar la hora de llegada del camion", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                CargarWebService();
+                if(etHoraIngresoTerminal.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe seleccionar la hora de ingreso a terminal", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(etHoraAperturaCamion.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe seleccionar la hora de apertura del camion", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(bitmapArray.size()<3)
+                {
+                    Toast.makeText(context, "Deben tomarse 3 fotos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                CargarWebService(ter, and);
             }
         });
     }
 
-    private void CargarWebService() {
+    private void CargarWebService(final Terminal ter, final Anden and) {
         pdDialogo = new ProgressDialog(context);
         pdDialogo.setMessage(
                 "Cargando..."
@@ -529,24 +560,27 @@ public class RegistroActivity extends AppCompatActivity  {
         pdDialogo.setCancelable(false);
         pdDialogo.show();
 
-/*        url = url.replace(" ","%20");
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
-        request.add(jsonObjectRequest);*/
 
         stringRequest= new StringRequest(Request.Method.POST, URL_Registro, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 pdDialogo.hide();
-                if(response.trim().equalsIgnoreCase("registra"))
+                if(response.trim().contains("registrado"))
                 {
 
                     Intent intent = new Intent(RegistroActivity.this,ProcesoActivity.class);
-                    //intent.putExtra("sello",etSello.getText().toString());
-                    //etFecha.setText("");
-                    //etSello.setText("");
+                    intent.putExtra("id_registro",response.trim().split(";")[1]);
+                    intent.putExtra("usuario", (Serializable) usuario);
+                    spnrTerminal.setSelection(0);
                     etPatente.setText("");
+                    etChofer.setText("");
+                    etHoraAperturaCamion.setText("");
+                    etHoraIngresoTerminal.setText("");
+                    etHoraLlegadaCamion.setText("");
+                    ivFoto.setImageResource(0);
 
                     bitmapImagen = null;
+                    bitmapArray.clear();
                     startActivity(intent);
                 }
                 else
@@ -563,17 +597,30 @@ public class RegistroActivity extends AppCompatActivity  {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                String id_cliente = cliente;
+                String id_terminal = Integer.toString(ter.getID());
+                String id_anden = Integer.toString(and.getID());
                 String patente = etPatente.getText().toString();
-                //String sello = etSello.getText().toString();
-                //String fecha = etFecha.getText().toString();
-
-                String imagen = ConvertirImagenString(bitmapImagen);
+                String chofer = etChofer.getText().toString();
+                String hora_llegada_camion = etHoraLlegadaCamion.getText().toString();
+                String hora_ingreso_terminal = etHoraIngresoTerminal.getText().toString();
+                String hora_apertura_camion = etHoraAperturaCamion.getText().toString();
+                String id_usuario = usuario.getID();
 
                 Map<String,String> parameters = new HashMap<>();
+                parameters.put("id_cliente",id_cliente);
+                parameters.put("id_terminal",id_terminal);
+                parameters.put("id_anden",id_anden);
                 parameters.put("patente",patente);
-                //parameters.put("sello",sello);
-                //parameters.put("fecha",fecha);
-                parameters.put("imagen",imagen);
+                parameters.put("chofer",chofer);
+                parameters.put("hora_llegada_camion",hora_llegada_camion);
+                parameters.put("hora_ingreso_terminal",hora_ingreso_terminal);
+                parameters.put("hora_apertura_camion",hora_apertura_camion);
+                parameters.put("id_usuario",id_usuario);
+                for(int index = 0 ; index<bitmapArray.size();index++)
+                {
+                    parameters.put("imagen_"+index, ConvertirImagenString(bitmapArray.get(index)));
+                }
                 return parameters;
             }
         };

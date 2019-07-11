@@ -21,6 +21,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.atc.registrocamion.Entidades.Usuario;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,7 +39,8 @@ public class ProcesoActivity extends AppCompatActivity {
     private EditText etGuiaAerea,etHoraIniciaDescarga,etHoraTerminoDescarga;
     private Button  btnGuardarProceso,btnTerminarProceso;
     private ProgressDialog pdDialogo;
-    private String Sello;
+    private String id_registro;
+    private Usuario usuario;
 
     private RequestQueue request;
     private StringRequest stringRequest;
@@ -51,7 +53,8 @@ public class ProcesoActivity extends AppCompatActivity {
         context = this;
         URL = getString(R.string.URL_Proceso);
         request = Volley.newRequestQueue(context);
-        Sello = (String)getIntent().getSerializableExtra("sello");
+        id_registro = (String)getIntent().getSerializableExtra("id_registro");
+        usuario = (Usuario)getIntent().getSerializableExtra("usuario");
         //Controles
         etGuiaAerea = findViewById(R.id.etGuiaAerea);
         etHoraIniciaDescarga = findViewById(R.id.etHoraInicioDescarga);
@@ -97,18 +100,23 @@ public class ProcesoActivity extends AppCompatActivity {
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                String po = etPO.getText().toString();
-                String sello = Sello;
-//                if(etPO.getText().toString().equals(""))
-//                {
-//                    Toast.makeText(context, "Debe ingresar la PO", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                if(Sello.equals(""))
+
+                if(etGuiaAerea.getText().toString().equals(""))
                 {
-                    Toast.makeText(context, "Debe ingresar el sello", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Debe ingresar la guia aerea", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(etHoraIniciaDescarga.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar la hora de inicio de descarga", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(etHoraTerminoDescarga.getText().toString().equals(""))
+                {
+                    Toast.makeText(context, "Debe ingresar la hora de termino de descarga", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 
                 CargarWebService();
             }
@@ -132,9 +140,10 @@ public class ProcesoActivity extends AppCompatActivity {
                 pdDialogo.hide();
                 if(response.trim().equalsIgnoreCase("registra"))
                 {
-                    //etPO.setText("");
-                    //bitmapImagen = null;
-                    //ivFotoProceso.setImageResource(0);
+                    etGuiaAerea.setText("");
+                    etHoraIniciaDescarga.setText("");
+                    etHoraTerminoDescarga.setText("");
+
                     Toast.makeText(context, "Se ha ingresado con exito", Toast.LENGTH_SHORT).show();
                 }
                 else
@@ -151,14 +160,16 @@ public class ProcesoActivity extends AppCompatActivity {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                //String po = etPO.getText().toString();
-
-                //String imagen = ConvertirImagenString(bitmapImagen);
+                String guia_aerea = etGuiaAerea.getText().toString();
+                String hora_inicio_descarga = etHoraIniciaDescarga.getText().toString();
+                String hora_termino_descarga = etHoraTerminoDescarga.getText().toString();;
 
                 Map<String,String> parameters = new HashMap<>();
-                //parameters.put("po",po);
-                parameters.put("sello",Sello);
-                //parameters.put("imagen",imagen);
+                parameters.put("id_registro",id_registro);
+                parameters.put("guia_aerea",guia_aerea);
+                parameters.put("hora_inicio_descarga",hora_inicio_descarga);
+                parameters.put("hora_termino_descarga",hora_termino_descarga);
+                parameters.put("id_usuario",usuario.getID());
                 return parameters;
             }
         };

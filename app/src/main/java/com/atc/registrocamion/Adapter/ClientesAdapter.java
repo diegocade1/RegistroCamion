@@ -48,7 +48,7 @@ public class ClientesAdapter extends RecyclerView.Adapter<ClientesAdapter.Client
                 // Toast.makeText(ComplexRecyclerViewAdapter.this, "Item no: "+ position, Toast.LENGTH_LONG).show;
                 //Toast.makeText(v.getContext(), "General click !", Toast.LENGTH_SHORT).show();
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("result",listaClientes.get(i).getNombre());
+                returnIntent.putExtra("result",listaClientes.get(i).getNombre()+";"+listaClientes.get(i).getID());
                 ((Activity) context).setResult(Activity.RESULT_OK,returnIntent);
                 ((Activity) context).finish();
             }

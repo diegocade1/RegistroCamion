@@ -5,10 +5,5 @@
     <string name="URL_ListaCliente">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaCliente.php</string>
     <string name="URL_ListaTerminal">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaTerminal.php</string>
     <string name="URL_ListaAnden">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaAnden.php</string>
-    <!--    <string name="URL_1">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>
-    <string name="URL_2">http://192.168.1.135/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>-->
-    <!--<string name="URL_1">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobil.php</string>-->
-    <!--<string name="URL_2">http://192.168.0.26/PaginaRegistroCamion/ws/wsJSONRegistroMobilDetalle.php</string>-->
-    <!--<string name="URL_1">http://fastpharma.cl/ws/wsJSONRegistroMobil.php</string>-->
-    <!--<string name="URL_2">http://fastpharma.cl/ws/wsJSONRegistroMobilDetalle.php</string>-->
+    <string name="URL_ValidacionUsuario">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilValidacionUsuario.php</string>
 </resources>
