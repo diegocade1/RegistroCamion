@@ -17,7 +17,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.atc.registrocamion.Entidades.Usuario;
@@ -26,7 +25,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UsuarioActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private Context context;
 
@@ -42,7 +41,7 @@ public class UsuarioActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_usuario);
+        setContentView(R.layout.activity_login);
         context = this;
         URL_ValidacionUsuario = getString(R.string.URL_ValidacionUsuario);
         request = Volley.newRequestQueue(context);
@@ -91,14 +90,12 @@ public class UsuarioActivity extends AppCompatActivity {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent keyevent) {
 
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && keyevent.getAction()==0) {
 
                     String usuario = text.getText().toString();
                     if(!usuario.trim().equals(""))
                     {
-                        startActivity(new Intent(UsuarioActivity.this,ClienteActivity.class)
-                                .putExtra("usuario",usuario)
-                                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                        CargarWebServiceValidacion(usuario.toLowerCase());
 
                     }
                     else
@@ -134,7 +131,7 @@ public class UsuarioActivity extends AppCompatActivity {
                 {
                     String temp = response.trim().split(";")[1];
                     Usuario user = new Usuario(temp.split(",")[0],temp.split(",")[1],temp.split(",")[2]);
-                    startActivity(new Intent(UsuarioActivity.this,ClienteActivity.class)
+                    startActivity(new Intent(LoginActivity.this,MainActivity.class)
                             .putExtra("usuario", (Serializable) user)
                             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
                     esconderKeyboard();

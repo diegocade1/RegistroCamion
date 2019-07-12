@@ -36,7 +36,14 @@
                 android:layout_marginTop="-10dp"
                 android:layout_height="70dp"
                 android:layout_marginBottom="10dp"
-                android:text="Registro" />
+                android:text="Crear Registro" />
+            <Button
+                android:id="@+id/btnRegistrosPendientes"
+                android:layout_width="300dp"
+                android:layout_marginTop="-10dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="10dp"
+                android:text="Registros Pendientes" />
 
             <Button
                 android:id="@+id/btnSalir"

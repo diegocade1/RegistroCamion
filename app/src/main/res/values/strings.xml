@@ -6,4 +6,6 @@
     <string name="URL_ListaTerminal">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaTerminal.php</string>
     <string name="URL_ListaAnden">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaAnden.php</string>
     <string name="URL_ValidacionUsuario">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilValidacionUsuario.php</string>
+    <string name="URL_TerminarRegistro">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilTerminarRegistro.php</string>
+    <string name="URL_RegistroPendiente">http://192.168.1.149/PaginaRegistroCamion/ws/wsJSONRegistroMobilListaRegistrosPendientes.php</string>
 </resources>

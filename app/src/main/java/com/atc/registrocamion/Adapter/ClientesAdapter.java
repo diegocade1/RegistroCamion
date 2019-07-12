@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atc.registrocamion.Entidades.Cliente;
 import com.atc.registrocamion.R;
@@ -30,7 +29,7 @@ public class ClientesAdapter extends RecyclerView.Adapter<ClientesAdapter.Client
     @NonNull
     @Override
     public ClientesHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View vista = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fila_lista,viewGroup,false);
+        View vista = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fila_lista_clientes,viewGroup,false);
         RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         vista.setLayoutParams(layoutParams);

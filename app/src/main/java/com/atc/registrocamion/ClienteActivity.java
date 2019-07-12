@@ -60,7 +60,6 @@ public class ClienteActivity extends AppCompatActivity {
 
     private void ActionTouchCliente(final EditText hora)
     {
-
         hora.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -111,6 +110,7 @@ public class ClienteActivity extends AppCompatActivity {
                             .putExtra("usuario", (Serializable) usuario)
                             .putExtra("cliente",cliente.split(";")[1])
                             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                    finish();
 
                 }
                 else

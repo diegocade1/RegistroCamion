@@ -563,12 +563,12 @@ public class RegistroActivity extends AppCompatActivity  {
 
         stringRequest= new StringRequest(Request.Method.POST, URL_Registro, new Response.Listener<String>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(final String response) {
                 pdDialogo.hide();
                 if(response.trim().contains("registrado"))
                 {
 
-                    Intent intent = new Intent(RegistroActivity.this,ProcesoActivity.class);
+/*                    Intent intent = new Intent(RegistroActivity.this,ProcesoActivity.class);
                     intent.putExtra("id_registro",response.trim().split(";")[1]);
                     intent.putExtra("usuario", (Serializable) usuario);
                     spnrTerminal.setSelection(0);
@@ -581,7 +581,65 @@ public class RegistroActivity extends AppCompatActivity  {
 
                     bitmapImagen = null;
                     bitmapArray.clear();
-                    startActivity(intent);
+                    startActivity(intent);*/
+
+                    AlertDialog dialog = new AlertDialog.Builder(context).setMessage("¿Desea continuar?")
+                            .setCancelable(false)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    Intent intent = new Intent(RegistroActivity.this,ProcesoActivity.class);
+                                    intent.putExtra("id_registro",response.trim().split(";")[1]);
+                                    intent.putExtra("usuario", (Serializable) usuario);
+                                    spnrTerminal.setSelection(0);
+                                    etPatente.setText("");
+                                    etChofer.setText("");
+                                    etHoraAperturaCamion.setText("");
+                                    etHoraIngresoTerminal.setText("");
+                                    etHoraLlegadaCamion.setText("");
+                                    ivFoto.setImageResource(0);
+
+                                    bitmapImagen = null;
+                                    bitmapArray.clear();
+                                    startActivity(intent);
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    spnrTerminal.setSelection(0);
+                                    etPatente.setText("");
+                                    etChofer.setText("");
+                                    etHoraAperturaCamion.setText("");
+                                    etHoraIngresoTerminal.setText("");
+                                    etHoraLlegadaCamion.setText("");
+                                    ivFoto.setImageResource(0);
+
+                                    bitmapImagen = null;
+                                    bitmapArray.clear();
+                                }
+                            }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    dialog.dismiss();
+                                    dialog.dismiss();
+                                    spnrTerminal.setSelection(0);
+                                    etPatente.setText("");
+                                    etChofer.setText("");
+                                    etHoraAperturaCamion.setText("");
+                                    etHoraIngresoTerminal.setText("");
+                                    etHoraLlegadaCamion.setText("");
+                                    ivFoto.setImageResource(0);
+
+                                    bitmapImagen = null;
+                                    bitmapArray.clear();
+                                }
+                            }).create();
+                    dialog.show();
                 }
                 else
                 {

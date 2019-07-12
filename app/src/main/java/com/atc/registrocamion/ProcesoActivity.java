@@ -3,6 +3,7 @@ package com.atc.registrocamion;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.atc.registrocamion.Entidades.Usuario;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +32,7 @@ import java.util.Map;
 public class ProcesoActivity extends AppCompatActivity {
 
     //URL DINAMICO CAMBIAR VALOR EN res/values/strings
-    private String URL;
+    private String URL,URL_Terminar;
 
 
     private Uri pathImage;
@@ -52,6 +54,7 @@ public class ProcesoActivity extends AppCompatActivity {
         //
         context = this;
         URL = getString(R.string.URL_Proceso);
+        URL_Terminar = getString(R.string.URL_TerminarRegistro);
         request = Volley.newRequestQueue(context);
         id_registro = (String)getIntent().getSerializableExtra("id_registro");
         usuario = (Usuario)getIntent().getSerializableExtra("usuario");
@@ -176,12 +179,53 @@ public class ProcesoActivity extends AppCompatActivity {
         request.add(stringRequest);
     }
 
+    private void CargarWebServiceTerminarRegistro(final String id_reg) {
+        pdDialogo = new ProgressDialog(context);
+        pdDialogo.setMessage(
+                "Cargando..."
+        );
+        pdDialogo.setCancelable(false);
+        pdDialogo.show();
+
+
+        stringRequest= new StringRequest(Request.Method.POST, URL_Terminar, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                pdDialogo.hide();
+                if(response.trim().contains("terminado"))
+                {
+                    Toast.makeText(context, "Registro terminado.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, "No se pudo terminar proceso. "+response, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "No se ha podido conectar", Toast.LENGTH_SHORT).show();
+                pdDialogo.hide();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String,String> parameters = new HashMap<>();
+                parameters.put("id_registro",id_reg);
+                return parameters;
+            }
+        };
+        request.add(stringRequest);
+    }
+
 
     private void ActionButtonTerminarProceso(Button button)
     {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CargarWebServiceTerminarRegistro(id_registro);
                 finish();
             }
         });

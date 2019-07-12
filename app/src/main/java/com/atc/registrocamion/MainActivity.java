@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.atc.registrocamion.Entidades.Usuario;
+
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -27,7 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context;
 
-    private Button btnRegistro,btnSalir;
+    private Button btnRegistro,btnSalir,btnRegistrosPendiente;
+
+    private Usuario usuario;
 
 
     @Override
@@ -35,10 +39,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        usuario = (Usuario)getIntent().getSerializableExtra("usuario");
 
         /*----------Controles----------*/
         btnRegistro = findViewById(R.id.btnRegistro);
         btnSalir = findViewById(R.id.btnSalir);
+        btnRegistrosPendiente = findViewById(R.id.btnRegistrosPendientes);
         /*----------Permisos--------*/
         if(ValidarPermisos())
         {
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         /*--------Acciones----------*/
         ActionBtnSalir(btnSalir);
         ActionBtnRegistro(btnRegistro);
+        ActionBtnRegistrosPendientes(btnRegistrosPendiente);
     }
 
     private void ActionBtnSalir(Button boton)
@@ -69,7 +76,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(MainActivity.this,UsuarioActivity.class));
+                startActivity(new Intent(MainActivity.this,ClienteActivity.class).putExtra("usuario",usuario));
+            }
+        });
+    }
+
+    private void ActionBtnRegistrosPendientes(Button boton)
+    {
+        boton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(MainActivity.this,ListaRegistroPendienteActivity.class).putExtra("usuario",usuario));
             }
         });
     }

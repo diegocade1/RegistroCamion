@@ -14,16 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListaClientesActivity"></activity>
-        <activity android:name=".ClienteActivity" />
-        <activity android:name=".UsuarioActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ListaRegistroPendienteActivity" />
+        <activity android:name=".ListaClientesActivity" />
+        <activity android:name=".ClienteActivity" />
+        <activity android:name=".MainActivity"/>
         <activity android:name=".ProcesoActivity" />
         <activity android:name=".RegistroActivity" />
 
